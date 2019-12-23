@@ -1,11 +1,16 @@
 """SOWN Backup script."""
+import logging
+import logging.handlers
+
 import libzfs_core
 from pynetbox.api import Api
 
 from .config import NETBOX_URL
 
+logger = logging.getLogger(__name__)
 
-def getbackups():
+
+def get_backups():
     """Get list of servers to back up from netbox."""
     nb = Api(NETBOX_URL, ssl_verify=False)
 
@@ -18,22 +23,42 @@ def getbackups():
     for server in servers:
         if "Backup" in server.tags:
             if not server.primary_ip:
-                print("%s has no primary IP" % server.name)
+                logger.error(f"{server.name} has no primary IP")
             elif not server.primary_ip.dns_name:
-                print("%s has no DNS name for primary IP" % server.name)
+                logger.error(f"{server.name} has no DNS name for primary IP")
             else:
                 tobackup.append(server.primary_ip.dns_name)
 
     return tobackup
 
 
+def logger_setup(quiet):
+    """Setup the logger."""
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    syslog = logging.handlers.SysLogHandler("/dev/log")
+    syslog.setLevel(logging.INFO)
+
+    stderr = logging.StreamHandler()
+    if quiet:
+        stderr.setLevel(logging.WARNING)
+    else:
+        stderr.setLevel(logging.INFO)
+
+    logger.addHandler(stderr)
+    logger.addHandler(syslog)
+
+
 def main():
     """Do backups."""
-    for backup in getbackups():
-        dataset = "data/%s" % backup
+    logger_setup(False)
+
+    for backup in get_backups():
+        dataset = f"data/{backup}"
         bdataset = bytes(dataset, "ascii")
         if not libzfs_core.lzc_exists(bdataset):
             libzfs_core.lzc_create(bdataset)
-            print("created %s" % dataset)
+            logger.info(f"created {dataset}")
         else:
-            print("%s already exists" % dataset)
+            logger.info(f"{dataset} already exists")
