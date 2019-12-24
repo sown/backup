@@ -26,6 +26,6 @@ root@backup-test:/opt/sown/backup# ln -rs ./venv/bin/backup /usr/local/bin/
 As the module is installed in editable mode, you can work on the source directly. To add dependencies, edit setup.py, and re-run the pip command above.
 
 To run the linter:
-```
+```console
 root@backup-test:/opt/sown/backup# ./venv/bin/flake8 backup
 ```
