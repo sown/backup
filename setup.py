@@ -11,7 +11,6 @@ setup(
     zip_safe=False,
     install_requires=[
         "pynetbox",
-        "pyzfs",
     ],
     extras_require={
         "dev": [

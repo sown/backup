@@ -2,10 +2,10 @@
 import logging
 import logging.handlers
 
-import libzfs_core
 from pynetbox.api import Api
 
 from .config import NETBOX_URL
+from .zfs import dataset_create, dataset_exists, dataset_mount, dataset_mounted
 
 logger = logging.getLogger(__name__)
 
@@ -57,8 +57,10 @@ def main():
     for backup in get_backups():
         dataset = f"data/{backup}"
         bdataset = bytes(dataset, "ascii")
-        if not libzfs_core.lzc_exists(bdataset):
-            libzfs_core.lzc_create(bdataset)
+        if not dataset_exists(dataset):
+            dataset_create(bdataset)
             logger.info(f"created {dataset}")
         else:
             logger.info(f"{dataset} already exists")
+            if not dataset_mounted(dataset):
+                dataset_mount(dataset)
