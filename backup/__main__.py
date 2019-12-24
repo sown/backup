@@ -56,9 +56,8 @@ def main():
 
     for backup in get_backups():
         dataset = f"data/{backup}"
-        bdataset = bytes(dataset, "ascii")
         if not dataset_exists(dataset):
-            dataset_create(bdataset)
+            dataset_create(dataset)
             logger.info(f"created {dataset}")
         else:
             logger.info(f"{dataset} already exists")
