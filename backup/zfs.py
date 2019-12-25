@@ -29,3 +29,11 @@ def dataset_create(dataset):
                           stdout=subprocess.DEVNULL,
                           stderr=subprocess.DEVNULL)
     return True
+
+
+def dataset_snapshot(dataset, snap):
+    """Creates a dataset."""
+    subprocess.check_call(["zfs", "snapshot", f"{dataset}@{snap}"],
+                          stdout=subprocess.DEVNULL,
+                          stderr=subprocess.DEVNULL)
+    return True
