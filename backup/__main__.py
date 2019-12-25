@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 def get_backups():
     """Get list of servers to back up from netbox."""
+    logger.info(f"Getting servers to backup from netbox")
     nb = Api(NETBOX_URL, ssl_verify=False)
 
     tobackup = []
@@ -42,12 +43,13 @@ def main():
         dataset = f"data/{backup}"
         if not dataset_exists(dataset):
             dataset_create(dataset)
-            logger.info(f"created {dataset}")
+            logger.info(f"created dataset {dataset}")
         else:
-            logger.info(f"{dataset} already exists")
+            logger.info(f"dataset {dataset} already exists")
             if not dataset_mounted(dataset):
                 dataset_mount(dataset)
 
+        logger.info(f"Starting rsync for {backup}")
         rsync = subprocess.run(["rsync",
                                 "-e", "ssh -o 'StrictHostKeyChecking yes'",
                                 "--one-file-system",

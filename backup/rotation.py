@@ -29,7 +29,7 @@ def snapshot(dataset):
             last = dates[-1]
             diff = (datetime.now() - last).days
             if diff >= days:
-                logger.info(f"Snapshoting {dataset}, "
+                logger.info(f"Snapshotting {dataset}, "
                             f"schedule {name} every {days} days, "
                             f"last snapshot {diff} days ago")
                 dataset_snapshot(dataset, get_snap_name(datetime.now(), name))
@@ -38,7 +38,7 @@ def snapshot(dataset):
                             f"schedule {name} every {days} days, "
                             f"last snapshot {diff} days ago")
         else:
-            logger.info(f"Snapshoting {dataset}, "
+            logger.info(f"Snapshotting {dataset}, "
                         f"schedule {name} every {days} days, "
                         f"no existing snapshot")
             dataset_snapshot(dataset, get_snap_name(datetime.now(), name))
