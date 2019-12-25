@@ -1,4 +1,6 @@
 """SOWN Backup configuration."""
+from .schedules import Schedules
+
 NETBOX_URL = "https://netbox.example.com"
 ROTATION_SCHEDULE = {
     Schedules.DAILY: 7,
