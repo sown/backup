@@ -3,9 +3,11 @@ import logging
 import subprocess
 from typing import List
 
+import paramiko
 from pynetbox.api import Api
 
 from .config import NETBOX_URL
+from .excludes import STANDARD_EXCLUDES
 from .logconfig import logger_setup
 from .rotation import do_rotation
 from .zfs import dataset_create, dataset_exists, dataset_mount, dataset_mounted
@@ -50,21 +52,47 @@ def main():
             if not dataset_mounted(dataset):
                 dataset_mount(dataset)
 
-        LOGGER.info(f"Starting rsync for {backup}")
-        rsync = subprocess.run(["rsync",
-                                "-e", "ssh -o 'StrictHostKeyChecking yes'",
-                                "--one-file-system",
-                                "--quiet",
-                                "--archive",
-                                "--delete",
-                                f"{backup}:/",
-                                f"/{dataset}/"],
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.STDOUT)
+        customexcludes = []
+        sshclient = paramiko.SSHClient()
+        sshclient.load_system_host_keys()
+        try:
+            sshclient.connect(backup)
+            sftpclient = sshclient.open_sftp()
+            try:
+                excludefile = sftpclient.open("/etc/backup-exclude.conf")
+                customexcludes = excludefile.read().decode("utf-8").split("\n")
+                LOGGER.info(f"Using custom excludes on {backup}: {customexcludes}")
+                excludefile.close()
+            except FileNotFoundError:
+                LOGGER.info(f"No excludes found for {backup}, using standard ones only")
+            sshclient.close()
 
-        if rsync.returncode == 0:
-            LOGGER.info(f"{backup} backup complete.")
-            do_rotation(dataset)
-        else:
-            LOGGER.error(f"{backup} backup failed with:")
-            LOGGER.error(rsync.stdout.decode('utf-8'))
+            excludes = STANDARD_EXCLUDES + customexcludes
+
+            LOGGER.info(f"Starting rsync for {backup}")
+            rsync = subprocess.run(["rsync",
+                                    "-e", "ssh -o 'StrictHostKeyChecking yes'",
+                                    # bail out if host key error, rather than prompting
+                                    "--one-file-system",
+                                    "--quiet",
+                                    "--archive",
+                                    "--delete",
+                                    "--delete-excluded",
+                                    "--exclude-from=-",
+                                    # read our generated exclude list from stdin
+                                    f"{backup}:/",
+                                    f"/{dataset}/"],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT,
+                                   input="\n".join(excludes),
+                                   encoding="utf-8")
+
+            if rsync.returncode == 0:
+                LOGGER.info(f"{backup} backup complete.")
+                do_rotation(dataset)
+            else:
+                LOGGER.error(f"{backup} backup failed with:")
+                LOGGER.error(rsync.stdout)
+
+        except paramiko.ssh_exception.SSHException:
+            LOGGER.error(f"SSHing to {backup} failed")
