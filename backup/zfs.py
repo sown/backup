@@ -37,3 +37,24 @@ def dataset_snapshot(dataset, snap):
                           stdout=subprocess.DEVNULL,
                           stderr=subprocess.DEVNULL)
     return True
+
+
+def dataset_get_snapshots(dataset):
+    """Gets a list of snapshots for a dataset."""
+    output = subprocess.check_output(["zfs", "list",
+                                      "-t", "snapshot",
+                                      "-r", "-d1",
+                                      "-H", "-oname",
+                                      dataset])
+    output = output.decode("utf-8").split("\n")
+    output = filter(None, output)
+    snaps = list(map(lambda full: full.split("@")[1], output))
+    snaps = sorted(snaps)
+    return snaps
+
+
+def dataset_destroy_snapshot(dataset, snap):
+    """Destroys a snapshot."""
+    subprocess.check_call(["zfs", "destroy", f"{dataset}@{snap}"],
+                          stdout=subprocess.DEVNULL,
+                          stderr=subprocess.DEVNULL)

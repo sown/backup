@@ -1,19 +1,13 @@
 """SOWN Backup script."""
 import logging
 import subprocess
-from datetime import datetime
 
 from pynetbox.api import Api
 
 from .config import NETBOX_URL
 from .logging import logger_setup
-from .zfs import (
-    dataset_create,
-    dataset_exists,
-    dataset_mount,
-    dataset_mounted,
-    dataset_snapshot,
-)
+from .rotation import do_rotation
+from .zfs import dataset_create, dataset_exists, dataset_mount, dataset_mounted
 
 logger = logging.getLogger(__name__)
 
@@ -67,8 +61,7 @@ def main():
 
         if rsync.returncode == 0:
             logger.info(f"{backup} backup complete.")
-            snapshot = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-            dataset_snapshot(dataset, snapshot)
+            do_rotation(dataset)
         else:
             logger.error(f"{backup} backup failed with:")
             logger.error(rsync.stdout.decode('utf-8'))
