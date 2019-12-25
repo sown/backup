@@ -1,12 +1,12 @@
 """SOWN Backup script."""
 import logging
-import logging.handlers
 import subprocess
 from datetime import datetime
 
 from pynetbox.api import Api
 
 from .config import NETBOX_URL
+from .logging import logger_setup
 from .zfs import (
     dataset_create,
     dataset_exists,
@@ -38,24 +38,6 @@ def get_backups():
                 tobackup.append(server.primary_ip.dns_name)
 
     return tobackup
-
-
-def logger_setup(quiet):
-    """Setup the logger."""
-    logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-
-    syslog = logging.handlers.SysLogHandler("/dev/log")
-    syslog.setLevel(logging.INFO)
-
-    stderr = logging.StreamHandler()
-    if quiet:
-        stderr.setLevel(logging.WARNING)
-    else:
-        stderr.setLevel(logging.INFO)
-
-    logger.addHandler(stderr)
-    logger.addHandler(syslog)
 
 
 def main():
