@@ -10,12 +10,12 @@ from .logging import logger_setup
 from .rotation import do_rotation
 from .zfs import dataset_create, dataset_exists, dataset_mount, dataset_mounted
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 
 def get_backups() -> List[str]:
     """Get list of servers to back up from netbox."""
-    logger.info(f"Getting servers to backup from netbox")
+    LOGGER.info(f"Getting servers to backup from netbox")
     nb = Api(NETBOX_URL, ssl_verify=False)
 
     tobackup = []
@@ -27,9 +27,9 @@ def get_backups() -> List[str]:
     for server in servers:
         if "Backup" in server.tags:
             if not server.primary_ip:
-                logger.error(f"{server.name} has no primary IP")
+                LOGGER.error(f"{server.name} has no primary IP")
             elif not server.primary_ip.dns_name:
-                logger.error(f"{server.name} has no DNS name for primary IP")
+                LOGGER.error(f"{server.name} has no DNS name for primary IP")
             else:
                 tobackup.append(server.primary_ip.dns_name)
 
@@ -44,13 +44,13 @@ def main():
         dataset = f"data/{backup}"
         if not dataset_exists(dataset):
             dataset_create(dataset)
-            logger.info(f"created dataset {dataset}")
+            LOGGER.info(f"created dataset {dataset}")
         else:
-            logger.info(f"dataset {dataset} already exists")
+            LOGGER.info(f"dataset {dataset} already exists")
             if not dataset_mounted(dataset):
                 dataset_mount(dataset)
 
-        logger.info(f"Starting rsync for {backup}")
+        LOGGER.info(f"Starting rsync for {backup}")
         rsync = subprocess.run(["rsync",
                                 "-e", "ssh -o 'StrictHostKeyChecking yes'",
                                 "--one-file-system",
@@ -63,8 +63,8 @@ def main():
                                stderr=subprocess.STDOUT)
 
         if rsync.returncode == 0:
-            logger.info(f"{backup} backup complete.")
+            LOGGER.info(f"{backup} backup complete.")
             do_rotation(dataset)
         else:
-            logger.error(f"{backup} backup failed with:")
-            logger.error(rsync.stdout.decode('utf-8'))
+            LOGGER.error(f"{backup} backup failed with:")
+            LOGGER.error(rsync.stdout.decode('utf-8'))
