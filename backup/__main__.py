@@ -6,7 +6,7 @@ from typing import List
 from pynetbox.api import Api
 
 from .config import NETBOX_URL
-from .logging import logger_setup
+from .logconfig import logger_setup
 from .rotation import do_rotation
 from .zfs import dataset_create, dataset_exists, dataset_mount, dataset_mounted
 
