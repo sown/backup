@@ -1,6 +1,7 @@
 """SOWN Backup script."""
 import logging
 import subprocess
+from typing import List
 
 from pynetbox.api import Api
 
@@ -12,7 +13,7 @@ from .zfs import dataset_create, dataset_exists, dataset_mount, dataset_mounted
 logger = logging.getLogger(__name__)
 
 
-def get_backups():
+def get_backups() -> List[str]:
     """Get list of servers to back up from netbox."""
     logger.info(f"Getting servers to backup from netbox")
     nb = Api(NETBOX_URL, ssl_verify=False)
