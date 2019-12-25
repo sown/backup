@@ -85,7 +85,7 @@ def main():
 
         if rsync.returncode == 0:
             logger.info(f"{backup} backup complete.")
-            snapshot = datetime.now().strftime("%Y-%m-%d-%H-%m-%S")
+            snapshot = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
             dataset_snapshot(dataset, snapshot)
         else:
             logger.error(f"{backup} backup failed with:")
