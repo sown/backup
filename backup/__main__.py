@@ -8,6 +8,7 @@ from pynetbox.api import Api
 
 from .config import NETBOX_URL
 from .excludes import STANDARD_EXCLUDES
+from .icinga import passive_report
 from .logconfig import logger_setup
 from .rotation import do_rotation
 from .zfs import dataset_create, dataset_exists, dataset_mount, dataset_mounted
@@ -89,7 +90,15 @@ def main():
 
             if rsync.returncode == 0:
                 LOGGER.info(f"{backup} backup complete.")
+                # take and rotate snapshots now that we're done
                 do_rotation(dataset)
+                # tell icinga
+                passive_report(
+                    host="VPN",
+                    service="BACKUP",
+                    message="Backup completed.",
+                    status=0,
+                )
             else:
                 LOGGER.error(f"{backup} backup failed with:")
                 LOGGER.error(rsync.stdout)
