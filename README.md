@@ -1,3 +1,15 @@
+This is SOWN's (in development) backup system, currently deployed on `backup-test`.
+
+It automatically takes backups of all hosts in Netbox with the `Backup` tag, doing the following:
+- creating a zfs dataset `data/{hostname}`
+- rsyncing the server's rootfs to there
+  - excluding a list of standard files/directories in `excludes.py`
+  - excluding any files/directories listed in `/etc/backup-exclude.conf` on the server being backed up
+- taking and rotating ZFS snapshots at regular intervals, keeping as many as are needed per `config.py`
+- notifying Icinga about backup completion for passive checks
+
+You can find all backups in `/data`, with snapshots exposed in `/data/{hostname}/.zfs/snapshots/`.
+
 ## Installing
 To start, clone the repo, assumed to `/opt/sown/backup`. Then create a virtual environment and install it:
 ```console
