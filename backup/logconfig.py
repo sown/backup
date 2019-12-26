@@ -5,7 +5,7 @@ import logging.handlers
 
 def logger_setup(quiet: bool) -> None:
     """Setup the logger."""
-    logger = logging.getLogger("backup")
+    logger = logging.getLogger(__package__)
     logger.setLevel(logging.INFO)
 
     syslog = logging.handlers.SysLogHandler("/dev/log")

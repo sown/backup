@@ -12,6 +12,7 @@ setup(
     install_requires=[
         "pynetbox",
         "paramiko",
+        "click",
     ],
     extras_require={
         "dev": [
@@ -27,7 +28,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "backup=backup.__main__:main",
+            "backup=backup.cli:cli",
         ],
     },
 )
