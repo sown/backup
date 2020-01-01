@@ -39,5 +39,6 @@ As the module is installed in editable mode, you can work on the source directly
 
 To run the linter:
 ```console
-root@backup-test:/opt/sown/backup# ./venv/bin/flake8 backup
+root@backup-test:/opt/sown/backup# source venv/bin/activate
+(venv) root@backup-test:/opt/sown/backup# flake8 backup
 ```
