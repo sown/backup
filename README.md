@@ -10,6 +10,19 @@ It automatically takes backups of all hosts in Netbox with the `Backup` tag, doi
 
 You can find all backups in `/data`, with snapshots exposed in `/data/{hostname}/.zfs/snapshots/`.
 
+## Manually taking a backup
+About to do something dangerous? You can manually kick off a backup and a snapshot to make sure it's kept. Eg:
+```console
+root@backup-test:~# backup --quiet vpn
+root@backup-test:~# zfs snapshot data/vpn@tds-before-18.04-upgrade
+```
+(skip the --quiet if you want to see logs as the backup takes place)
+
+To delete a snapshot you made by hand:
+```console
+root@backup-test:~# zfs destroy data/vpn@tds-before-18.04-upgrade
+```
+
 ## Installing
 To start, clone the repo, assumed to `/opt/sown/backup`. Then create a virtual environment and install it:
 ```console
