@@ -36,6 +36,16 @@ def backup_server(server: str) -> None:
             excludefile.close()
         except FileNotFoundError:
             LOGGER.info(f"No excludes found for {server}, using standard ones only")
+
+        (stdin, stdout, stderr) = sshclient.exec_command(
+            "/bin/run-parts --report /etc/backup-scripts/ 2>&1")
+        hooksrun = stdout.channel.recv_exit_status() == 0
+        if not hooksrun:
+            LOGGER.error(f"Hook scripts failed to run on {server} with errors:")
+            LOGGER.error(stdout.read().decode("utf-8"))
+        else:
+            LOGGER.info(f"Hook scripts run on {server}")
+
         sshclient.close()
 
         excludes = STANDARD_EXCLUDES + customexcludes
