@@ -54,6 +54,7 @@ def backup_server(server: str) -> None:
         rsync = subprocess.run(["rsync",
                                 "-e", "ssh -o 'StrictHostKeyChecking yes'",
                                 # bail out if host key error, rather than prompting
+                                "--compress",
                                 "--one-file-system",
                                 "--quiet",
                                 "--archive",
