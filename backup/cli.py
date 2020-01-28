@@ -1,5 +1,6 @@
 """CLI."""
 import logging
+import random
 
 import click
 
@@ -30,6 +31,7 @@ def cli(server, force, quiet) -> None:
         servers = get_backup_servers()
 
     if server == "all":
+        random.shuffle(servers)
         for server in servers:
             backup_server(server)
     else:
