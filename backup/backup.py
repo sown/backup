@@ -1,5 +1,6 @@
 """Backup a server."""
 import logging
+import socket
 import subprocess
 
 import paramiko
@@ -76,7 +77,7 @@ def backup_server(server: str) -> None:
             # tell icinga
             passive_report(
                 host=server.upper(),
-                service="BACKUP",
+                service=f"BACKUP-{socket.gethostname().upper()}",
                 message="Backup completed.",
                 status=0,
             )
