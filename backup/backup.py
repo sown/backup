@@ -11,6 +11,7 @@ from .rotation import do_rotation
 from .zfs import dataset_create, dataset_exists, dataset_mount, dataset_mounted
 
 LOGGER = logging.getLogger(__name__)
+RSYNC = "/usr/bin/rsync"
 
 
 def backup_server(server: str) -> None:
@@ -52,7 +53,7 @@ def backup_server(server: str) -> None:
         excludes = STANDARD_EXCLUDES + customexcludes
 
         LOGGER.info(f"Starting rsync for {server}")
-        rsync = subprocess.run(["rsync",
+        rsync = subprocess.run([RSYNC,
                                 "-e", "ssh -o 'StrictHostKeyChecking yes'",
                                 # bail out if host key error, rather than prompting
                                 "--compress",
