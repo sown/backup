@@ -1,4 +1,4 @@
-"""icingagen package configuration."""
+"""package configuration."""
 from setuptools import setup
 
 setup(

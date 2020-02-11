@@ -72,7 +72,9 @@ def backup_server(server: str) -> None:
                                input="\n".join(excludes),
                                encoding="utf-8")
 
-        if rsync.returncode == 0:
+        # also treat files disappearing during sync as a success
+        # typically from monitoring systems, temporary files, etc
+        if rsync.returncode == 0 or rsync.returncode == 24:
             LOGGER.info(f"{server} backup complete.")
             # take and rotate snapshots now that we're done
             do_rotation(dataset)
