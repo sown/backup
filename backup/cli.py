@@ -36,7 +36,7 @@ def cli(server, force, quiet) -> None:
             backup_server(server)
     else:
         if force or server in servers:
-            backup_server(server.lower())
+            backup_server(server)
         else:
             click.echo(f"{server} wasn't found in netbox. "
                        "Run with --force to back up anyway.")

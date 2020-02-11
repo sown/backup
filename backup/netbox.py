@@ -23,5 +23,5 @@ def get_backup_servers() -> List[str]:
     for server in servers:
         if "Backup" in server.tags:
             # assume that the server's hostname will be in DNS for now
-            tobackup.append(server.name.lower())
+            tobackup.append(server.name)
     return tobackup

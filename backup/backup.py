@@ -1,10 +1,10 @@
 """Backup a server."""
 import logging
-import socket
 import subprocess
 
 import paramiko
 
+from .config import ICINGA_HOSTNAME
 from .excludes import STANDARD_EXCLUDES
 from .icinga import passive_report
 from .rotation import do_rotation
@@ -16,7 +16,7 @@ RSYNC = "/usr/bin/rsync"
 
 def backup_server(server: str) -> None:
     """Backup a server."""
-    dataset = f"data/{server}"
+    dataset = f"data/{server.lower()}"
     if not dataset_exists(dataset):
         dataset_create(dataset)
         LOGGER.info(f"created dataset {dataset}")
@@ -29,7 +29,7 @@ def backup_server(server: str) -> None:
     sshclient = paramiko.SSHClient()
     sshclient.load_system_host_keys()
     try:
-        sshclient.connect(server)
+        sshclient.connect(server.lower())
         sftpclient = sshclient.open_sftp()
         try:
             excludefile = sftpclient.open("/etc/backup-exclude.conf")
@@ -65,7 +65,7 @@ def backup_server(server: str) -> None:
                                 "--delete-excluded",
                                 "--exclude-from=-",
                                 # read our generated exclude list from stdin
-                                f"{server}:/",
+                                f"{server.lower()}:/",
                                 f"/{dataset}/"],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.STDOUT,
@@ -78,8 +78,8 @@ def backup_server(server: str) -> None:
             do_rotation(dataset)
             # tell icinga
             passive_report(
-                host=server.upper(),
-                service=f"BACKUP-{socket.gethostname().upper()}",
+                host=server,
+                service=f"BACKUP-{ICINGA_HOSTNAME}",
                 message="Backup completed.",
                 status=0,
             )
