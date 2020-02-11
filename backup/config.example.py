@@ -10,6 +10,6 @@ ROTATION_SCHEDULE = {
 }
 ICINGA_URL = "https://icinga.example.com:5665/v1/"
 ICINGA_USER = "backups"
-ICINGA_PASS = "icingagenpass"
+ICINGA_PASS = "icingapass"
 ICINGA_CA = "/var/lib/icinga2/certs/ca.crt"
 ICINGA_HOSTNAME = "backup-server"
