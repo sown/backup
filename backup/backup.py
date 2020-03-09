@@ -89,6 +89,6 @@ def backup_server(server: str) -> None:
             LOGGER.error(f"{server} backup failed with:")
             LOGGER.error(rsync.stdout)
 
-    except paramiko.ssh_exception.SSHException as e:
+    except (paramiko.ssh_exception.SSHException, TimeoutError) as e:
         LOGGER.error(f"SSHing to {server} failed:")
         LOGGER.error(repr(e))
