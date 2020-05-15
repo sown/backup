@@ -11,7 +11,7 @@ LOGGER = logging.getLogger(__name__)
 
 def get_backup_servers() -> List[str]:
     """Get list of servers to back up from netbox."""
-    LOGGER.info(f"Getting servers to backup from netbox")
+    LOGGER.info("Getting servers to backup from netbox")
     nb = Api(NETBOX_URL, ssl_verify=False)
 
     tobackup = []

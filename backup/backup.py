@@ -78,6 +78,11 @@ def backup_server(server: str) -> None:
             LOGGER.info(f"{server} backup complete.")
             # take and rotate snapshots now that we're done
             do_rotation(dataset)
+        else:
+            LOGGER.error(f"{server} backup failed with:")
+            LOGGER.error(rsync.stdout)
+
+        if (rsync.returncode == 0 or rsync.returncode == 24) and hooksrun:
             # tell icinga
             passive_report(
                 host=server,
@@ -85,9 +90,6 @@ def backup_server(server: str) -> None:
                 message="Backup completed.",
                 status=0,
             )
-        else:
-            LOGGER.error(f"{server} backup failed with:")
-            LOGGER.error(rsync.stdout)
 
     except (paramiko.ssh_exception.SSHException, TimeoutError) as e:
         LOGGER.error(f"SSHing to {server} failed:")
