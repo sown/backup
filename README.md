@@ -12,6 +12,22 @@ It automatically takes backups of all hosts in Netbox with the `Backup` tag, doi
 
 You can find all backups in `/data`, with snapshots exposed in `/data/{hostname}/.zfs/snapshots/`.
 
+## Hook scripts
+Before running a backup, all executable files in `/etc/backup-scripts/` will be run via `run-parts`.
+
+Hook scipts should confirm success via exit codes - if a non-zero exit code is returned, the backup script will generate an error (which will turn into a cron mail and an icinga alert). As there are multiple backup servers that run independently, hook scripts also need to be able to cope with being run multiple times at once.
+
+`/var/lib/backup/` is created by ansible and is a safe place to store backup files so they will only be readable by root. Any backup scripts that are used on multiple servers should be deployed via ansible.
+
+A simple example:
+```bash
+#!/bin/bash
+set -eo pipefail
+# back up the date, very important!
+date > /var/lib/backup/date.$$
+mv /var/lib/backup/date.$$ /var/lib/backup/date
+```
+
 ## Manually taking a backup
 About to do something dangerous? You can manually kick off a backup and a snapshot to make sure it's kept. Eg:
 ```console
