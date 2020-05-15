@@ -42,8 +42,16 @@ root@backup-test:~# zfs destroy data/vpn@tds-before-18.04-upgrade
 ```
 
 ## Installing
-To start, clone the repo, assumed to `/opt/sown/backup`. Then create a virtual environment and install it:
+Before starting, you'll need a zfs pool called `data`. Eg on an ubuntu install, using an LVM LV for the backing block device:
 ```console
+root@backup2:~# apt install zfsutils-linux
+root@backup2:~# zpool create -o ashift=12 -O compression=lz4 data /dev/ubuntu-vg/data
+```
+
+Then clone the repo, create a virtual environment and install it:
+```console
+root@backup-test:~# mkdir -p /opt/sown
+root@backup-test:~# git -C /opt/sown/ clone git@github.com:sown/backup.git
 root@backup-test:~# cd /opt/sown/backup/
 root@backup-test:/opt/sown/backup# python3 -m venv venv
 root@backup-test:/opt/sown/backup# ./venv/bin/pip3 install -e .[dev]
