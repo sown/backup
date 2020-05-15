@@ -10,6 +10,9 @@ def logger_setup(quiet: bool) -> None:
 
     syslog = logging.handlers.SysLogHandler("/dev/log")
     syslog.setLevel(logging.INFO)
+    syslog.setFormatter(logging.Formatter(
+        "%(levelname)s - %(name)s - %(message)s",
+    ))
 
     stderr = logging.StreamHandler()
     if quiet:
