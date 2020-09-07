@@ -2,7 +2,7 @@
 import logging
 from typing import List
 
-from pynetbox.api import Api
+import pynetbox
 
 from .config import NETBOX_URL
 
@@ -12,7 +12,7 @@ LOGGER = logging.getLogger(__name__)
 def get_backup_servers() -> List[str]:
     """Get list of servers to back up from netbox."""
     LOGGER.info("Getting servers to backup from netbox")
-    nb = Api(NETBOX_URL, ssl_verify=False)
+    nb = pynetbox.api(NETBOX_URL)
 
     tobackup = []
 
@@ -21,7 +21,7 @@ def get_backup_servers() -> List[str]:
     servers = devices + vms
 
     for server in servers:
-        if "Backup" in server.tags:
+        if "Backup" in [tag.name for tag in server.tags]:
             # assume that the server's hostname will be in DNS for now
             tobackup.append(server.name)
     return tobackup
