@@ -91,6 +91,6 @@ def backup_server(server: str) -> None:
                 status=0,
             )
 
-    except (paramiko.ssh_exception.SSHException, TimeoutError) as e:
+    except (paramiko.ssh_exception.SSHException, paramiko.ssh_exception.NoValidConnectionsError, TimeoutError) as e:
         LOGGER.error(f"SSHing to {server} failed:")
         LOGGER.error(repr(e))
