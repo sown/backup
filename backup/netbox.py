@@ -16,8 +16,8 @@ def get_backup_servers() -> List[str]:
 
     tobackup = []
 
-    devices = nb.dcim.devices.all()
-    vms = nb.virtualization.virtual_machines.all()
+    devices = list(nb.dcim.devices.all())
+    vms = list(nb.virtualization.virtual_machines.all())
     servers = devices + vms
 
     for server in servers:
