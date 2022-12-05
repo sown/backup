@@ -4,7 +4,7 @@ from typing import List
 
 import pynetbox
 
-from .config import NETBOX_URL
+from .config import NETBOX_URL, NETBOX_TOKEN
 
 LOGGER = logging.getLogger(__name__)
 
@@ -12,7 +12,7 @@ LOGGER = logging.getLogger(__name__)
 def get_backup_servers() -> List[str]:
     """Get list of servers to back up from netbox."""
     LOGGER.info("Getting servers to backup from netbox")
-    nb = pynetbox.api(NETBOX_URL)
+    nb = pynetbox.api(NETBOX_URL, token=NETBOX_TOKEN)
 
     tobackup = []
 

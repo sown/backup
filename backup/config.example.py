@@ -2,6 +2,7 @@
 from .schedules import Schedules
 
 NETBOX_URL = "https://netbox.example.com"
+NETBOX_TOKEN = ""
 ROTATION_SCHEDULE = {
     Schedules.DAILY: 7,
     Schedules.WEEKLY: 4,
