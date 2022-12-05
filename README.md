@@ -17,7 +17,7 @@ All logs go to syslog, and when running from cron, errors will be emailed to SOW
 
 To get full logs from journald:
 ```console
-root@backup3:~# journalctl -e _COMM=backup
+root@backup:~# journalctl -e _COMM=backup
 ```
 
 ### Manually taking a backup
