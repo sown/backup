@@ -1,6 +1,6 @@
 # SOWN Backup
 
-This is SOWN's backup system, currently deployed on `backup2` and `backup3`. On those servers you can find all backups in `/data`, with snapshots exposed in `/data/{hostname}/.zfs/snapshots/`.
+This is SOWN's backup system, currently deployed on `backup-b32-1` and `backup-b53-1`. On those servers you can find all backups in `/data`, with snapshots exposed in `/data/{hostname}/.zfs/snapshots/`.
 
 It automatically takes backups of all hosts in Netbox with the `Backup` tag, doing the following:
 - creating a zfs dataset `data/{hostname}`
@@ -23,14 +23,14 @@ root@backup3:~# journalctl -e _COMM=backup
 ### Manually taking a backup
 About to do something dangerous? You can manually kick off a backup and a snapshot to make sure it's kept. Eg:
 ```console
-root@backup-test:~# backup --quiet vpn
-root@backup-test:~# zfs snapshot data/vpn@tds-before-18.04-upgrade
+root@backup:~# backup --quiet vpn
+root@backup:~# zfs snapshot data/vpn@tds-before-18.04-upgrade
 ```
 (skip the --quiet if you want to see logs as the backup takes place)
 
 To delete a snapshot you made by hand:
 ```console
-root@backup-test:~# zfs destroy data/vpn@tds-before-18.04-upgrade
+root@backup:~# zfs destroy data/vpn@tds-before-18.04-upgrade
 ```
 ## Internal details
 ### Hook scripts
@@ -52,33 +52,33 @@ mv /var/lib/backup/date.$$ /var/lib/backup/date
 ### Installing
 Before starting, you'll need a zfs pool called `data`. Eg on an ubuntu install, using an LVM LV for the backing block device:
 ```console
-root@backup2:~# apt install zfsutils-linux
-root@backup2:~# zpool create -o ashift=12 -O compression=lz4 data /dev/ubuntu-vg/data
+root@backup:~# apt install zfsutils-linux
+root@backup:~# zpool create -o ashift=12 -O compression=lz4 data /dev/ubuntu-vg/data
 ```
 
 Then clone the repo, create a virtual environment and install it:
 ```console
-root@backup-test:~# mkdir -p /opt/sown
-root@backup-test:~# git -C /opt/sown/ clone git@github.com:sown/backup.git
-root@backup-test:~# cd /opt/sown/backup/
-root@backup-test:/opt/sown/backup# python3 -m venv venv
-root@backup-test:/opt/sown/backup# ./venv/bin/pip3 install -e .[dev]
+root@backup:~# mkdir -p /opt/sown
+root@backup:~# git -C /opt/sown/ clone git@github.com:sown/backup.git
+root@backup:~# cd /opt/sown/backup/
+root@backup:/opt/sown/backup# python3 -m venv venv
+root@backup:/opt/sown/backup# ./venv/bin/pip3 install -e .[dev]
 ```
 
 Write a config:
 ```console
-root@backup-test:/opt/sown/backup# cp backup/config.example.py backup/config.py
-root@backup-test:/opt/sown/backup# vim backup/config.py 
+root@backup:/opt/sown/backup# cp backup/config.example.py backup/config.py
+root@backup:/opt/sown/backup# vim backup/config.py 
 ```
 
 You can then run it like so:
 ```console
-root@backup-test:/opt/sown/backup# ./venv/bin/backup 
+root@backup:/opt/sown/backup# ./venv/bin/backup 
 ```
 
 To make the "backup" command work system-wide:
 ```console
-root@backup-test:/opt/sown/backup# ln -rs ./venv/bin/backup /usr/local/bin/
+root@backup:/opt/sown/backup# ln -rs ./venv/bin/backup /usr/local/bin/
 ```
 
 Once everything is up and running, add something like this to root's crontab:
@@ -92,6 +92,6 @@ As the module is installed in editable mode, you can work on the source directly
 
 To run the linter:
 ```console
-root@backup-test:/opt/sown/backup# source venv/bin/activate
-(venv) root@backup-test:/opt/sown/backup# flake8 backup
+root@backup:/opt/sown/backup# source venv/bin/activate
+(venv) root@backup:/opt/sown/backup# flake8 backup
 ```
