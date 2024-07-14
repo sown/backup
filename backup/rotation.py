@@ -69,7 +69,7 @@ def get_snapshots(dataset: str, schname: str) -> list[datetime]:
     dates = []
     for snap in snaps:
         try:
-            dates.append(datetime.strptime(snap, f"backup-{schname}-%Y-%m-%d"))  # noqa: DTZ007
+            dates.append(datetime.strptime(snap, f"backup-{schname}-%Y-%m-%d").replace(tzinfo=TIMEZONE))
         except ValueError:
             # snapshot didn't match our scheme, ignore
             pass
