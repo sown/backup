@@ -1,7 +1,12 @@
 """SOWN Backup configuration."""
-from .schedules import Schedules
 
-NETBOX_URL = "https://netbox.example.com"
+from zoneinfo import ZoneInfo
+
+from backup.schedules import Schedules
+
+TIMEZONE = ZoneInfo("Europe/London")
+
+NETBOX_URL = "https://netbox.example.com/graphql/"
 NETBOX_TOKEN = ""
 ROTATION_SCHEDULE = {
     Schedules.DAILY: 7,
@@ -11,6 +16,6 @@ ROTATION_SCHEDULE = {
 }
 ICINGA_URL = "https://icinga.example.com:5665/v1/"
 ICINGA_USER = "backups"
-ICINGA_PASS = "icingapass"
+ICINGA_PASS = "icingapass"  # noqa: S105
 ICINGA_CA = "/var/lib/icinga2/certs/ca.crt"
 ICINGA_HOSTNAME = "backup-server"

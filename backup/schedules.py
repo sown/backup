@@ -1,4 +1,5 @@
 """Backup rotation schedules."""
+
 from enum import Enum
 
 

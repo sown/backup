@@ -1,9 +1,9 @@
 """Snapshot roation."""
+
 import logging
 from datetime import datetime
-from typing import List
 
-from .config import ROTATION_SCHEDULE
+from .config import ROTATION_SCHEDULE, TIMEZONE
 from .schedules import Schedules
 from .zfs import (
     dataset_destroy_snapshot,
@@ -29,24 +29,24 @@ def snapshot(dataset: str) -> None:
         if len(dates):
             # we have a snapshot, find the last and how long ago it was
             last = dates[-1]
-            diff = (datetime.now() - last).days
+            diff = (datetime.now(tz=TIMEZONE) - last).days
             # snapshot if it was as long ago (or longer) than the schedule
             if diff >= days:
-                LOGGER.info(f"Snapshotting {dataset}, "
-                            f"schedule {name} every {days} days, "
-                            f"last snapshot {diff} days ago")
-                dataset_snapshot(dataset, get_snap_name(datetime.now(), name))
+                LOGGER.info(
+                    f"Snapshotting {dataset}, " f"schedule {name} every {days} days, " f"last snapshot {diff} days ago"
+                )
+                dataset_snapshot(dataset, get_snap_name(datetime.now(tz=TIMEZONE), name))
             else:
-                LOGGER.info(f"Skipping snapshot of {dataset}, "
-                            f"schedule {name} every {days} days, "
-                            f"last snapshot {diff} days ago")
+                LOGGER.info(
+                    f"Skipping snapshot of {dataset}, "
+                    f"schedule {name} every {days} days, "
+                    f"last snapshot {diff} days ago"
+                )
         else:
             # no existing snapshot for this schedule
             # so snapshot now
-            LOGGER.info(f"Snapshotting {dataset}, "
-                        f"schedule {name} every {days} days, "
-                        f"no existing snapshot")
-            dataset_snapshot(dataset, get_snap_name(datetime.now(), name))
+            LOGGER.info(f"Snapshotting {dataset}, " f"schedule {name} every {days} days, " f"no existing snapshot")
+            dataset_snapshot(dataset, get_snap_name(datetime.now(tz=TIMEZONE), name))
 
 
 def cleanup(dataset: str) -> None:
@@ -63,13 +63,13 @@ def cleanup(dataset: str) -> None:
             dataset_destroy_snapshot(dataset, snapshot)
 
 
-def get_snapshots(dataset: str, schname: str) -> List[datetime]:
+def get_snapshots(dataset: str, schname: str) -> list[datetime]:
     """Gets snapshot dates (sorted) for a schedule name."""
     snaps = dataset_get_snapshots(dataset)
     dates = []
     for snap in snaps:
         try:
-            dates.append(datetime.strptime(snap, f"backup-{schname}-%Y-%m-%d"))
+            dates.append(datetime.strptime(snap, f"backup-{schname}-%Y-%m-%d"))  # noqa: DTZ007
         except ValueError:
             # snapshot didn't match our scheme, ignore
             pass

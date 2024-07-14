@@ -1,4 +1,5 @@
 """Backup a server."""
+
 import logging
 import subprocess
 
@@ -39,8 +40,7 @@ def backup_server(server: str) -> None:
         except FileNotFoundError:
             LOGGER.info(f"No excludes found for {server}, using standard ones only")
 
-        (stdin, stdout, stderr) = sshclient.exec_command(
-            "/bin/run-parts --report /etc/backup-scripts/ 2>&1")
+        (stdin, stdout, stderr) = sshclient.exec_command("/bin/run-parts --report /etc/backup-scripts/ 2>&1")
         hooksrun = stdout.channel.recv_exit_status() == 0
         if not hooksrun:
             LOGGER.error(f"Hook scripts failed to run on {server} with errors:")
@@ -53,24 +53,29 @@ def backup_server(server: str) -> None:
         excludes = STANDARD_EXCLUDES + customexcludes
 
         LOGGER.info(f"Starting rsync for {server}")
-        rsync = subprocess.run([RSYNC,
-                                "-e", "ssh -o 'StrictHostKeyChecking yes'",
-                                # bail out if host key error, rather than prompting
-                                "--compress",
-                                "--one-file-system",
-                                "--numeric-ids",
-                                "--quiet",
-                                "--archive",
-                                "--delete",
-                                "--delete-excluded",
-                                "--exclude-from=-",
-                                # read our generated exclude list from stdin
-                                f"{server.lower()}:/",
-                                f"/{dataset}/"],
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.STDOUT,
-                               input="\n".join(excludes),
-                               encoding="utf-8")
+        rsync = subprocess.run(
+            [
+                RSYNC,
+                "-e",
+                "ssh -o 'StrictHostKeyChecking yes'",
+                # bail out if host key error, rather than prompting
+                "--compress",
+                "--one-file-system",
+                "--numeric-ids",
+                "--quiet",
+                "--archive",
+                "--delete",
+                "--delete-excluded",
+                "--exclude-from=-",
+                # read our generated exclude list from stdin
+                f"{server.lower()}:/",
+                f"/{dataset}/",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            input="\n".join(excludes),
+            encoding="utf-8",
+        )
 
         # also treat files disappearing during sync as a success
         # typically from monitoring systems, temporary files, etc
