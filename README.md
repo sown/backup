@@ -62,7 +62,7 @@ root@backup:~# mkdir -p /opt/sown
 root@backup:~# git -C /opt/sown/ clone git@github.com:sown/backup.git
 root@backup:~# cd /opt/sown/backup/
 root@backup:/opt/sown/backup# python3 -m venv venv
-root@backup:/opt/sown/backup# ./venv/bin/pip3 install -e .[dev]
+root@backup:/opt/sown/backup# ./venv/bin/pip3 install .
 ```
 
 Write a config:
@@ -88,10 +88,20 @@ Once everything is up and running, add something like this to root's crontab:
 ```
 
 ### Developing
-As the module is installed in editable mode, you can work on the source directly. To add dependencies, edit setup.py, and re-run the pip command above.
+As the module is installed in editable mode, you can work on the source directly. To add dependencies, edit pyproject.toml, and run poetry update.
 
-To run the linter:
-```console
-root@backup:/opt/sown/backup# source venv/bin/activate
-(venv) root@backup:/opt/sown/backup# flake8 backup
-```
+Poetry is used to manage dependencies, and you will need it to update or add dependencies.
+
+You do not need poetry to install the tool or develop it.
+
+#### Linting
+
+We use `ruff` to ensure that our code meets the `PEP 8` standards.
+
+Execute the linter: ``make lint``
+
+#### Static Type Checking
+
+We use `mypy` to statically type check our code.
+
+Execute Type Checking: ``make type``
