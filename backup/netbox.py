@@ -1,15 +1,15 @@
 """Interface against Netbox to get hosts to backup."""
+
 import logging
-from typing import List
 
-import pynetbox
+import pynetbox  # type: ignore
 
-from .config import NETBOX_URL, NETBOX_TOKEN
+from .config import NETBOX_TOKEN, NETBOX_URL
 
 LOGGER = logging.getLogger(__name__)
 
 
-def get_backup_servers() -> List[str]:
+def get_backup_servers() -> list[str]:
     """Get list of servers to back up from netbox."""
     LOGGER.info("Getting servers to backup from netbox")
     nb = pynetbox.api(NETBOX_URL, token=NETBOX_TOKEN)
