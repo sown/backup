@@ -6,7 +6,7 @@ from backup.schedules import Schedules
 
 TIMEZONE = ZoneInfo("Europe/London")
 
-NETBOX_URL = "https://netbox.example.com"
+NETBOX_URL = "https://netbox.example.com/graphql/"
 NETBOX_TOKEN = ""
 ROTATION_SCHEDULE = {
     Schedules.DAILY: 7,
